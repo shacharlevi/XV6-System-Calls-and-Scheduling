@@ -125,3 +125,8 @@ get_cfs_stats:
  li a7, SYS_get_cfs_stats
  ecall
  ret
+.global set_policy
+set_policy:
+ li a7, SYS_set_policy
+ ecall
+ ret

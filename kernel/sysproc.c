@@ -51,6 +51,16 @@ sys_get_cfs_stats(void){//task6
   return get_cfs_stats(add,pid);
 }
 
+uint64
+sys_set_policy(void){
+  int policy;
+  argint(0,&policy);
+  if (policy >2 || policy<0){
+    return -1;
+  }
+  return set_policy(policy);
+}
+
 uint64 
 sys_set_ps_priority(void) {//task5
   int priority;

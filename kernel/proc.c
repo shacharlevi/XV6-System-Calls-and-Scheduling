@@ -13,7 +13,7 @@ struct proc proc[NPROC];
 int min_accumulator = __INT_MAX__;
 
 struct proc *initproc;
-int sched_policy = 2;
+int sched_policy=0;
 int nextpid = 1;
 struct spinlock pid_lock;
 
@@ -107,7 +107,10 @@ mycpu(void)
   struct cpu *c = &cpus[id];
   return c;
 }
-
+int set_policy(int policy){
+  sched_policy=policy;
+  return 0;
+}
 // Return the current struct proc *, or zero if none.
 struct proc *
 myproc(void)
