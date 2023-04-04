@@ -25,7 +25,7 @@ int uptime(void);
 int memsize(void);
 void set_ps_priority(int);
 int set_cfs_priority(int);
-int get_cfs_stats(int);
+int get_cfs_stats(int*,int);
 
 // ulib.c
 int stat(const char*, struct stat*);

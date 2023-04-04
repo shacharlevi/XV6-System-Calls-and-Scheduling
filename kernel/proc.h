@@ -100,7 +100,7 @@ struct proc {
   int rtime;
   int stime;
   int retime;
-
+  int decay;
 
   // these are private to the process, so p->lock need not be held.
   uint64 kstack;          // Virtual address of kernel stack

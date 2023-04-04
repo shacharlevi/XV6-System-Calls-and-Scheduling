@@ -165,10 +165,12 @@ kerneltrap()
 void
 clockintr()
 {
+  cfs_update();
   acquire(&tickslock);
   ticks++;
   wakeup(&ticks);
   release(&tickslock);
+  cfs_update();
 }
 
 // check if it's an external interrupt or software interrupt,

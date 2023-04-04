@@ -21,17 +21,38 @@ sys_exit(void)
   return 0;  // not reached
 }
 uint64 
-sys_set_cfs_priority(void) {
+sys_set_cfs_priority(void) { //task6
   int priority;
   argint(0, &priority);
   if (priority >2 || priority<0){
     return -1;
   }
   myproc()->cfs_priority=priority;
+  //  switch(myproc()->cfs_priority){
+  //         case 0:
+  //           myproc()->decay_factor=75;
+  //           break;
+  //         case 1:
+  //           myproc()->decay_factor=100;
+  //           break;
+  //         case 2:
+  //           decay_factor=125;
+  //           break;
+  //       }
   return 0;
 }
+
+uint64
+sys_get_cfs_stats(void){//task6
+  uint64 add;
+  argaddr(0, &add);
+  int pid;
+  argint(0,&pid);
+  return get_cfs_stats(add,pid);
+}
+
 uint64 
-sys_set_ps_priority(void) {
+sys_set_ps_priority(void) {//task5
   int priority;
   argint(0, &priority);
   if (priority < 1 || priority > 10) {
@@ -40,6 +61,7 @@ sys_set_ps_priority(void) {
   myproc()->ps_priority = priority;
   return 0;
 }
+
 uint64
 sys_getpid(void)
 {
