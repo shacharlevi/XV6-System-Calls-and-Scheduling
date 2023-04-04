@@ -47,7 +47,7 @@ sys_get_cfs_stats(void){//task6
   uint64 add;
   argaddr(0, &add);
   int pid;
-  argint(0,&pid);
+  argint(1,&pid);
   return get_cfs_stats(add,pid);
 }
 

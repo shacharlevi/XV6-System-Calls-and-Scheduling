@@ -29,12 +29,13 @@ int main(int argc, char *argv[]) {
         }
       }
       int ans[4];
-      if (get_cfs_stats(ans,pid) < 0) {
+      // printf("pid in cfs=%d\n",pid);
+      if (get_cfs_stats(ans,getpid()) < 0) {
         sleep(100);
         fprintf(1, "Error getting process statistics\n");
       } else {
         sleep(100);
-        fprintf(1, "Child (pid %d) finished,CFS priority: %d,Run time: %d ticks,Sleep time: %d ticks, Runnable time: %d ticks \n", pid,ans[0],ans[1],ans[2],ans[3]);
+        fprintf(1, "Child (pid %d) finished,CFS priority: %d,Run time: %d ticks,Sleep time: %d ticks, Runnable time: %d ticks \n", getpid(),ans[0],ans[1],ans[2],ans[3]);
         // sleep(100);
         // fprintf(1, "  CFS priority: %d\n", ans[0]);
         // sleep(100);
@@ -49,6 +50,7 @@ int main(int argc, char *argv[]) {
     } else if (pid < 0) {
       fprintf(1, "Fork failed\n");
     }
+     wait(0,"");
   }
 
   // wait for all child processes to finish

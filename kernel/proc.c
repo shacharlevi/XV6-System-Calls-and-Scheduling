@@ -877,15 +877,18 @@ int either_copyin(void *dst, int user_src, uint64 src, uint64 len)
 int get_cfs_stats(uint64 add, int pid)
 {
   struct proc *p;
+  // struct proc *found_proc;
+
   int values[4];
-  printf("%d\n",pid);
+  // printf("%d\n",pid);
   for (p = proc; p < &proc[NPROC]; p++)
   {
-      printf("p->pid=%d\n",p->pid);
+      // printf("p->pid=%d\n",p->pid);
     acquire(&p->lock);
     if (p->pid == pid)
     {
-      printf("here2\n");
+      
+      // printf("here2\n");
       values[0] = p->cfs_priority;
       values[1] = p->rtime;
       values[2] = p->stime;
