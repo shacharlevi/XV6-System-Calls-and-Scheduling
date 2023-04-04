@@ -79,7 +79,7 @@ usertrap(void)
   // give up the CPU if this is a timer interrupt.
   if(which_dev == 2){
     myproc()->accumulator+=myproc()->ps_priority;
-    // cfs_update();
+    cfs_update();
     yield();
   }
   usertrapret();
@@ -155,7 +155,7 @@ kerneltrap()
   // give up the CPU if this is a timer interrupt.
   if(which_dev == 2 && myproc() != 0 && myproc()->state == RUNNING){
     myproc()->accumulator+=myproc()->ps_priority;
-    // cfs_update();
+    cfs_update();
     yield();
   }
   // the yield() may have caused some traps to occur,
@@ -167,12 +167,12 @@ kerneltrap()
 void
 clockintr()
 {
-  cfs_update();
+  // cfs_update();
   acquire(&tickslock);
   ticks++;
   wakeup(&ticks);
   release(&tickslock);
-  cfs_update();
+  // cfs_update();
 }
 
 // check if it's an external interrupt or software interrupt,

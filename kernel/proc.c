@@ -880,27 +880,21 @@ int either_copyin(void *dst, int user_src, uint64 src, uint64 len)
 int get_cfs_stats(uint64 add, int pid)
 {
   struct proc *p;
-  // struct proc *found_proc;
 
   int values[4];
-  // printf("%d\n",pid);
   for (p = proc; p < &proc[NPROC]; p++)
   {
-      // printf("p->pid=%d\n",p->pid);
     acquire(&p->lock);
     if (p->pid == pid)
     {
-      
-      // printf("here2\n");
       values[0] = p->cfs_priority;
       values[1] = p->rtime;
       values[2] = p->stime;
       values[3] = p->retime;
-
+    printf("p number:%d, rtime:%d\n",p->pid,p->rtime);
       if (copyout(p->pagetable, add, (char *)values,
                               sizeof(values)) < 0)
       {
-        printf("here3\n");
         release(&p->lock);
         return -1;
       }
