@@ -27,6 +27,8 @@ void set_ps_priority(int);
 int set_cfs_priority(int);
 int get_cfs_stats(int*,int);
 int set_policy(int);
+struct proc* get_ps_priority(int);
+
 
 // ulib.c
 int stat(const char*, struct stat*);

@@ -47,7 +47,7 @@ forktest(void)
 
   print("fork test\n");
   3a:	00000517          	auipc	a0,0x0
-  3e:	47650513          	addi	a0,a0,1142 # 4b0 <set_policy+0x8>
+  3e:	47e50513          	addi	a0,a0,1150 # 4b8 <get_ps_priority+0x8>
   42:	00000097          	auipc	ra,0x0
   46:	fbe080e7          	jalr	-66(ra) # 0 <print>
 
@@ -71,18 +71,18 @@ forktest(void)
   if(n == N){
     print("fork claimed to work N times!\n");
   64:	00000517          	auipc	a0,0x0
-  68:	46450513          	addi	a0,a0,1124 # 4c8 <set_policy+0x20>
+  68:	46c50513          	addi	a0,a0,1132 # 4d0 <get_ps_priority+0x20>
   6c:	00000097          	auipc	ra,0x0
   70:	f94080e7          	jalr	-108(ra) # 0 <print>
     exit(1,"");
   74:	00000597          	auipc	a1,0x0
-  78:	44c58593          	addi	a1,a1,1100 # 4c0 <set_policy+0x18>
+  78:	45458593          	addi	a1,a1,1108 # 4c8 <get_ps_priority+0x18>
   7c:	4505                	li	a0,1
   7e:	00000097          	auipc	ra,0x0
   82:	36a080e7          	jalr	874(ra) # 3e8 <exit>
       exit(0,"");
   86:	00000597          	auipc	a1,0x0
-  8a:	43a58593          	addi	a1,a1,1082 # 4c0 <set_policy+0x18>
+  8a:	44258593          	addi	a1,a1,1090 # 4c8 <get_ps_priority+0x18>
   8e:	00000097          	auipc	ra,0x0
   92:	35a080e7          	jalr	858(ra) # 3e8 <exit>
   if(n == N){
@@ -93,7 +93,7 @@ forktest(void)
   for(; n > 0; n--){
     if(wait(0,"") < 0){
   9e:	00000917          	auipc	s2,0x0
-  a2:	42290913          	addi	s2,s2,1058 # 4c0 <set_policy+0x18>
+  a2:	42a90913          	addi	s2,s2,1066 # 4c8 <get_ps_priority+0x18>
   for(; n > 0; n--){
   a6:	00905c63          	blez	s1,be <forktest+0x90>
     if(wait(0,"") < 0){
@@ -112,7 +112,7 @@ forktest(void)
 
   if(wait(0,"") != -1){
   be:	00000597          	auipc	a1,0x0
-  c2:	40258593          	addi	a1,a1,1026 # 4c0 <set_policy+0x18>
+  c2:	40a58593          	addi	a1,a1,1034 # 4c8 <get_ps_priority+0x18>
   c6:	4501                	li	a0,0
   c8:	00000097          	auipc	ra,0x0
   cc:	328080e7          	jalr	808(ra) # 3f0 <wait>
@@ -124,7 +124,7 @@ forktest(void)
 
   print("fork test OK\n");
   d6:	00000517          	auipc	a0,0x0
-  da:	44250513          	addi	a0,a0,1090 # 518 <set_policy+0x70>
+  da:	44a50513          	addi	a0,a0,1098 # 520 <get_ps_priority+0x70>
   de:	00000097          	auipc	ra,0x0
   e2:	f22080e7          	jalr	-222(ra) # 0 <print>
 }
@@ -136,23 +136,23 @@ forktest(void)
   f0:	8082                	ret
       print("wait stopped early\n");
   f2:	00000517          	auipc	a0,0x0
-  f6:	3f650513          	addi	a0,a0,1014 # 4e8 <set_policy+0x40>
+  f6:	3fe50513          	addi	a0,a0,1022 # 4f0 <get_ps_priority+0x40>
   fa:	00000097          	auipc	ra,0x0
   fe:	f06080e7          	jalr	-250(ra) # 0 <print>
       exit(1,"");
  102:	00000597          	auipc	a1,0x0
- 106:	3be58593          	addi	a1,a1,958 # 4c0 <set_policy+0x18>
+ 106:	3c658593          	addi	a1,a1,966 # 4c8 <get_ps_priority+0x18>
  10a:	4505                	li	a0,1
  10c:	00000097          	auipc	ra,0x0
  110:	2dc080e7          	jalr	732(ra) # 3e8 <exit>
     print("wait got too many\n");
  114:	00000517          	auipc	a0,0x0
- 118:	3ec50513          	addi	a0,a0,1004 # 500 <set_policy+0x58>
+ 118:	3f450513          	addi	a0,a0,1012 # 508 <get_ps_priority+0x58>
  11c:	00000097          	auipc	ra,0x0
  120:	ee4080e7          	jalr	-284(ra) # 0 <print>
     exit(1,"");
  124:	00000597          	auipc	a1,0x0
- 128:	39c58593          	addi	a1,a1,924 # 4c0 <set_policy+0x18>
+ 128:	3a458593          	addi	a1,a1,932 # 4c8 <get_ps_priority+0x18>
  12c:	4505                	li	a0,1
  12e:	00000097          	auipc	ra,0x0
  132:	2ba080e7          	jalr	698(ra) # 3e8 <exit>
@@ -171,7 +171,7 @@ main(void)
  142:	ef0080e7          	jalr	-272(ra) # 2e <forktest>
   exit(0,"");
  146:	00000597          	auipc	a1,0x0
- 14a:	37a58593          	addi	a1,a1,890 # 4c0 <set_policy+0x18>
+ 14a:	38258593          	addi	a1,a1,898 # 4c8 <get_ps_priority+0x18>
  14e:	4501                	li	a0,0
  150:	00000097          	auipc	ra,0x0
  154:	298080e7          	jalr	664(ra) # 3e8 <exit>
@@ -193,7 +193,7 @@ _main()
  164:	fd6080e7          	jalr	-42(ra) # 136 <main>
   exit(0,"");
  168:	00000597          	auipc	a1,0x0
- 16c:	35858593          	addi	a1,a1,856 # 4c0 <set_policy+0x18>
+ 16c:	36058593          	addi	a1,a1,864 # 4c8 <get_ps_priority+0x18>
  170:	4501                	li	a0,0
  172:	00000097          	auipc	ra,0x0
  176:	276080e7          	jalr	630(ra) # 3e8 <exit>
@@ -879,3 +879,13 @@ set_policy:
  4aa:	00000073          	ecall
  ret
  4ae:	8082                	ret
+
+00000000000004b0 <get_ps_priority>:
+.global get_ps_priority
+get_ps_priority:
+ li a7, SYS_get_ps_priority
+ 4b0:	48ed                	li	a7,27
+ ecall
+ 4b2:	00000073          	ecall
+ ret
+ 4b6:	8082                	ret

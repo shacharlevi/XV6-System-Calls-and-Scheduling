@@ -116,6 +116,7 @@ mkfs/mkfs: mkfs/mkfs.c $K/fs.h $K/param.h
 .PRECIOUS: %.o
 
 UPROGS=\
+	$U/_test5\
 	$U/_policy\
 	$U/_cfs\
 	$U/_goodbye\

@@ -27,18 +27,9 @@ sys_set_cfs_priority(void) { //task6
   if (priority >2 || priority<0){
     return -1;
   }
+  acquire(& myproc()->lock);
   myproc()->cfs_priority=priority;
-  //  switch(myproc()->cfs_priority){
-  //         case 0:
-  //           myproc()->decay_factor=75;
-  //           break;
-  //         case 1:
-  //           myproc()->decay_factor=100;
-  //           break;
-  //         case 2:
-  //           decay_factor=125;
-  //           break;
-  //       }
+  release(& myproc()->lock);
   return 0;
 }
 
@@ -52,7 +43,7 @@ sys_get_cfs_stats(void){//task6
 }
 
 uint64
-sys_set_policy(void){
+sys_set_policy(void){//task7 
   int policy;
   argint(0,&policy);
   if (policy >2 || policy<0){
@@ -60,7 +51,10 @@ sys_set_policy(void){
   }
   return set_policy(policy);
 }
+// uint64
+// get_ps_priority(void){
 
+// }
 uint64 
 sys_set_ps_priority(void) {//task5
   int priority;
@@ -68,8 +62,23 @@ sys_set_ps_priority(void) {//task5
   if (priority < 1 || priority > 10) {
     return -1;
   }
+  acquire(&myproc()->lock);
   myproc()->ps_priority = priority;
+  release(&myproc()->lock);
+  // print the current process's priority
+  // printf("Process %d priority set to %d in sysproc.c\n", myproc()->pid, priority);
   return 0;
+}
+int
+sys_get_ps_priority(void)//test 5
+{
+  int pid;
+  argint(0, &pid);
+  struct proc *p = get_ps_priority(pid);
+  if (p == 0) {
+    return -1;
+  }
+  return p->ps_priority;
 }
 
 uint64

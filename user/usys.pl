@@ -41,5 +41,5 @@ entry("set_ps_priority");
 entry("set_cfs_priority");
 entry("get_cfs_stats");
 entry("set_policy");
-
+entry("get_ps_priority");
 

@@ -69,7 +69,7 @@ usertrap(void)
     // ok
   } else {
     printf("usertrap(): unexpected scause %p pid=%d\n", r_scause(), p->pid);
-    printf("            sepc=%p stval=%p\n", r_sepc(), r_stval());
+    printf(" sepc=%p stval=%p\n", r_sepc(), r_stval());
     setkilled(p);
   }
 
@@ -78,7 +78,11 @@ usertrap(void)
 
   // give up the CPU if this is a timer interrupt.
   if(which_dev == 2){
-    myproc()->accumulator+=myproc()->ps_priority;
+    acquire(&myproc()->lock);
+    if ( myproc()->accumulator<10)
+      myproc()->accumulator+=myproc()->ps_priority;
+    // printf("proc id %d : accummulator changed to %d in usertrap\n",myproc()->pid,myproc()->accumulator);
+    release(&myproc()->lock);
     cfs_update();
     yield();
   }
@@ -153,10 +157,16 @@ kerneltrap()
   }
 
   // give up the CPU if this is a timer interrupt.
-  if(which_dev == 2 && myproc() != 0 && myproc()->state == RUNNING){
-    myproc()->accumulator+=myproc()->ps_priority;
+  if(which_dev == 2){
     cfs_update();
-    yield();
+    if(myproc() != 0 && myproc()->state == RUNNING){
+      acquire(&myproc()->lock);
+      if (myproc()->accumulator<10)
+        myproc()->accumulator+=myproc()->ps_priority;
+      // printf("proc id %d : accummulator changed to %d in kerneltrap\n",myproc()->pid,myproc()->accumulator);
+      release(&myproc()->lock);
+      yield();
+    }
   }
   // the yield() may have caused some traps to occur,
   // so restore trap registers for use by kernelvec.S's sepc instruction.

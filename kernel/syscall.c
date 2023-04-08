@@ -106,7 +106,7 @@ extern uint64 sys_set_ps_priority(void);
 extern uint64 sys_set_cfs_priority(void);
 extern uint64 sys_get_cfs_stats(void);
 extern uint64 sys_set_policy(void);
-
+extern uint64 sys_get_ps_priority(void);
 
 
 
@@ -139,6 +139,7 @@ static uint64 (*syscalls[])(void) = {
 [SYS_set_cfs_priority] sys_set_cfs_priority,
 [SYS_get_cfs_stats] sys_get_cfs_stats,
 [SYS_set_policy] sys_set_policy,
+[SYS_get_ps_priority] sys_get_ps_priority,
 };
 
 void

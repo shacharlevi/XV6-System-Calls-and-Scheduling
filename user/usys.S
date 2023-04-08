@@ -130,3 +130,8 @@ set_policy:
  li a7, SYS_set_policy
  ecall
  ret
+.global get_ps_priority
+get_ps_priority:
+ li a7, SYS_get_ps_priority
+ ecall
+ ret

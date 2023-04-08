@@ -10,7 +10,7 @@
 struct cpu cpus[NCPU];
 
 struct proc proc[NPROC];
-int min_accumulator = __INT_MAX__;
+long long min_accumulator = __INT_MAX__;
 
 struct proc *initproc;
 int sched_policy=0;
@@ -109,6 +109,7 @@ mycpu(void)
 }
 int set_policy(int policy){
   sched_policy=policy;
+  // printf("policy succecfuly changed in proc.c to%d\n",sched_policy);
   return 0;
 }
 // Return the current struct proc *, or zero if none.
@@ -504,160 +505,146 @@ int wait(uint64 addr, uint64 dst)
     // }
   }
 }
-// struct proc* help(void){
-//   struct proc *p;
-//   long long min_accumulator = LLONG_MAX;
-//   struct proc *min_proc =  0;
-
-//   for (p = proc; p < &proc[NPROC]; p++) {
-//       acquire(&p->lock);
-//       if (p->state == RUNNABLE && p->accumulator < min_accumulator) {
-//         min_accumulator = p->accumulator;
-//         min_proc = p;
-//       }
-//       release(&p->lock);
-//     }
-//     return (min_proc);
-// }
-// Per-CPU process scheduler.
-// Each CPU calls scheduler() after setting itself up.
-// Scheduler never returns.  It loops, doing:
-//  - choose a process to run.
-//  - swtch to start running that process.
-//  - eventually that process transfers control
-//    via swtch back to the scheduler.
-
-void ps_scheduler(void)
-{
-  // struct proc *p;
-  struct cpu *c = mycpu();
+struct proc* get_ps_priority(int id) {
   struct proc *p;
-  struct proc *min_proc;
-  struct spinlock counter;
-  int proc_counter;
-  initlock(&counter, "counter");
-  c->proc = 0;
-  // intr_on(); // Avoid deadlock by ensuring that devices can interrupt.
-  min_proc = 0;
-  acquire(&counter);
-  proc_counter = 0;
-  release(&counter); // long long min_accumulator = LLONG_MAX;
-  for (p = proc; p < &proc[NPROC]; p++)
-  {
-    acquire(&p->lock); // printf("Process %d state: %d\n", p->pid, p->state);  // <-- Debugging statement
-    if (p->state == RUNNABLE && (p->accumulator < min_accumulator || proc_counter == 0))
-    {
-      // printf("bye");
-      acquire(&counter);
-      proc_counter++;
-      release(&counter);
-      min_accumulator = p->accumulator;
-      min_proc = p;
-    }
-    release(&p->lock);
-  }
-  if (min_proc != 0)
-  {
-    if (proc_counter == 1)
-    {
-      min_proc->accumulator = 0;
-    }
-    acquire(&min_proc->lock);
-    if (min_proc->state == RUNNABLE)
-    {
-      min_proc->state = RUNNING;
-      c->proc = min_proc;
-      swtch(&c->context, &min_proc->context);
-      c->proc = 0;
-    }
-    release(&min_proc->lock);
-  }
-}
-void cfs_scheduler(void){
-  struct cpu *c = mycpu();
-  struct proc *p;
-  struct proc *min_proc = 0;
-  int vruntime;
-  int decay_factor = 100;
-  int min_vruntime = __INT_MAX__;
-  c->proc = 0;
-  for (p = proc; p < &proc[NPROC]; p++){
+  struct proc *toreturn = 0;
+  for (p = proc; p < &proc[NPROC]; p++) {
     acquire(&p->lock);
-    switch (p->cfs_priority){
-    case 0:
-      decay_factor = 75;
-      break;
-    case 1:
-      decay_factor = 100;
-      break;
-    case 2:
-      decay_factor = 125;
-      break;
-    }
-    vruntime = decay_factor * ((p->rtime) / (p->rtime + p->stime + p->retime));
-    if (p->state == RUNNABLE && vruntime < min_vruntime){
-      min_vruntime = vruntime;
-      min_proc = p;
+    if (p->pid == id) {
+      toreturn = p;
     }
     release(&p->lock);
   }
-
-  if (min_proc != 0){
-    acquire(&min_proc->lock);
-    if (min_proc->state == RUNNABLE)
-    {
-      min_proc->state = RUNNING;
-      c->proc = min_proc;
-      swtch(&c->context, &min_proc->context);
-      c->proc = 0;
-    }
-    release(&min_proc->lock);
-  }
-}
-
-void original_scheduler(void){
-  struct proc *p;
-  struct cpu *c = mycpu();
-
-  c->proc = 0;
-
-  // Avoid deadlock by ensuring that devices can interrupt.
-  
-
-  for (p = proc; p < &proc[NPROC]; p++){
-    acquire(&p->lock);
-    if (p->state == RUNNABLE){
-      // Switch to chosen process.  It is the process's job
-      // to release its lock and then reacquire it
-      // before jumping back to us.
-      p->state = RUNNING;
-      c->proc = p;
-      swtch(&c->context, &p->context);
-
-      // Process is done running for now.
-      // It should have changed its p->state before coming back.
-      c->proc = 0;
-    }
-    release(&p->lock);
-  }
+  return toreturn;
 }
 
 void scheduler(void)
 {
+  struct cpu *c = mycpu();
+  struct proc *p;
+  struct proc *min_proc = 0;
+  struct spinlock counter;
+  int proc_counter;
+  int vruntime;
+  int decay_factor = 100;
+  int min_vruntime = __INT_MAX__;
+  long long min_acc = LLONG_MAX;
+  initlock(&counter, "counter");
+
   for (;;)
   {
     intr_on();
-    if (sched_policy == 0)
+
+    acquire(&counter);
+    proc_counter=0;
+    release(&counter);
+    
+    //     for(p = proc; p < &proc[NPROC]; p++) {
+    //     // acquire(&p->lock);
+    //     if(p->state == RUNNABLE|| (p->state == RUNNING && p->accumulator < min_accumulator)) {
+    //         min_accumulator = p->accumulator;
+    //     }
+    //     // release(&p->lock);
+    // }
+
+    // if(min_accumulator == LLONG_MAX) {
+    //     min_accumulator = 0;
+    // }
+    switch (sched_policy)
     {
-      original_scheduler();
-    }
-    if (sched_policy == 1)
-    {
-      ps_scheduler();
-    }
-    if (sched_policy == 2)
-    {
-      cfs_scheduler();
+      case 0: // original scheduler
+        for (p = proc; p < &proc[NPROC]; p++)
+        {
+          acquire(&p->lock);
+          if (p->state == RUNNABLE)
+          {
+            p->state = RUNNING;
+            c->proc = p;
+            swtch(&c->context, &p->context);
+            c->proc = 0;
+          }
+          release(&p->lock);
+        }
+        break;
+
+      case 1: // priority scheduler
+        min_proc = 0;
+        min_acc = LLONG_MAX;
+
+        for (p = proc; p < &proc[NPROC]; p++){
+          acquire(&p->lock);
+          if (p->state == RUNNABLE||p->state == RUNNING){
+            acquire(&counter);
+            proc_counter++;
+            release(&counter);
+            if ((p->accumulator < min_acc || proc_counter == 0)){ 
+              min_acc= p->accumulator;
+              min_accumulator=min_acc;
+              min_proc = p;
+            }
+          }
+          release(&p->lock);
+        }
+
+        if (min_proc != 0){          
+          acquire(&min_proc->lock);
+          // printf("proc_counter=%d\n",proc_counter);
+          if (proc_counter == 1){
+            min_proc->accumulator = 0;
+            min_accumulator=0;
+          }
+          if (min_proc->state == RUNNABLE){
+            // printf("process %d is chosen to be running now with accumulator= %d\n",min_proc->pid,min_proc->accumulator);
+            min_proc->state = RUNNING;
+            c->proc = min_proc;
+            swtch(&c->context, &min_proc->context);
+            c->proc = 0;
+          }
+          release(&min_proc->lock);
+        }
+        break;
+
+      case 2: // Completely Fair Scheduler
+        min_proc = 0;
+        min_vruntime = __INT_MAX__;
+
+        for (p = proc; p < &proc[NPROC]; p++)
+        {
+          acquire(&p->lock);
+          switch (p->cfs_priority)
+          {
+            case 0:
+              decay_factor = 75;
+              break;
+            case 1:
+              decay_factor = 100;
+              break;
+            case 2:
+              decay_factor = 125;
+              break;
+          }
+          vruntime = decay_factor * ((p->rtime) / (p->rtime + p->stime + p->retime));
+          if (p->state == RUNNABLE && vruntime < min_vruntime)
+          {
+            min_vruntime = vruntime;
+            min_proc = p;
+          }
+          release(&p->lock);
+        }
+
+        if (min_proc != 0)
+        {
+          acquire(&min_proc->lock);
+          if (min_proc->state == RUNNABLE)
+          {
+            min_proc->state = RUNNING;
+            c->proc = min_proc;
+            swtch(&c->context, &min_proc->context);
+            c->proc = 0;
+          }
+          release(&min_proc->lock);
+        }
+        break;
     }
   }
 }
@@ -787,15 +774,7 @@ void wakeup(void *chan)
         p->state = RUNNABLE;
         p->accumulator = min_accumulator;
       }
-      // if (p->state==RUNNABLE){
-      //   p->retime++;
-      // }
-      // else if(p->state==SLEEPING){
-      //   p->stime++;
-      // }
-      // else if (p->state==RUNNING){
-      //   p->rtime++;
-      // }
+      
       release(&p->lock);
     }
   }
@@ -891,7 +870,7 @@ int get_cfs_stats(uint64 add, int pid)
       values[1] = p->rtime;
       values[2] = p->stime;
       values[3] = p->retime;
-    printf("p number:%d, rtime:%d\n",p->pid,p->rtime);
+    // printf("p number:%d, rtime:%d\n",p->pid,p->rtime);
       if (copyout(p->pagetable, add, (char *)values,
                               sizeof(values)) < 0)
       {
